@@ -9,7 +9,7 @@
 import UIKit
 
 class planelistviewcontroller: UITableViewController {
-let itemarray = ["making cake","try more prog","use photo"]
+    var itemarray = ["making cake","try more prog","use photo"]
     override func viewDidLoad() {
         super.viewDidLoad()
         // tableview data sourse method
@@ -31,4 +31,24 @@ let itemarray = ["making cake","try more prog","use photo"]
         }else {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         }
-    }}
+    }
+    // add new item
+    
+    @IBAction func addbuttonpressed(_ sender: UIBarButtonItem) {
+        var textfield = UITextField()
+        let alert = UIAlertController(title: "add new plane", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "add item", style: .default) { (action) in
+            self.itemarray.append(textfield.text!)
+            self.tableView.reloadData()
+        }
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "create new item"
+            textfield = alertTextField
+           
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
+    
+}
