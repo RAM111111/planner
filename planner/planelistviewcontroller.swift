@@ -10,9 +10,13 @@ import UIKit
 
 class planelistviewcontroller: UITableViewController {
     var itemarray = ["making cake","try more prog","use photo"]
+    let defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
         // tableview data sourse method
+        if let  items = defaults.array(forKey: "plannerlistarray") as? [String]{
+            itemarray = items
+        }
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemarray.count
@@ -39,6 +43,7 @@ class planelistviewcontroller: UITableViewController {
         let alert = UIAlertController(title: "add new plane", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "add item", style: .default) { (action) in
             self.itemarray.append(textfield.text!)
+            self.defaults.set(self.itemarray, forKey: "plannerlistarray")
             self.tableView.reloadData()
         }
         alert.addTextField { (alertTextField) in
