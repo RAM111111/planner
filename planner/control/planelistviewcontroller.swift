@@ -9,32 +9,61 @@
 import UIKit
 
 class planelistviewcontroller: UITableViewController {
-    var itemarray = ["making cake","try more prog","use photo"]
+    var itemarray = [Item]()
     let defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
+        let newitem = Item()
+        newitem.title = "making cake"
+        itemarray.append(newitem)
+        
+        let newitem2 = Item()
+        newitem2.title = "tryprog"
+        itemarray.append(newitem2)
+        
+        let newitem3 = Item()
+        newitem3.title = "tryphoto"
+      
         // tableview data sourse method
-        if let  items = defaults.array(forKey: "plannerlistarray") as? [String]{
-            itemarray = items
-        }
+        
+//        if let  items = defaults.array(forKey: "plannerlistarray") as? [String]{
+//            itemarray = items
+//        }
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemarray.count
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+     
         let cell = tableView.dequeueReusableCell(withIdentifier: "planneritemlist", for: indexPath)
-        cell.textLabel?.text = itemarray[indexPath.row]
-        return cell
+        let item = itemarray[indexPath.row]
+        cell.textLabel?.text = item.title
+        cell.accessoryType =  item.done ? .checkmark : .none
+        
+        
+        if  item.done == true {
+            cell.accessoryType = .checkmark
+        }else{
+            cell.accessoryType = .none
+        }
+       return cell
+
+        
     }
      // tableview delegate method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(itemarray[indexPath.row])
+    //    print(itemarray[indexPath.row])
+        
+        itemarray[indexPath.row].done = !itemarray[indexPath.row].done
+        //the single lin short the down code
+//        if   itemarray[indexPath.row].done == false {
+//             itemarray[indexPath.row].done = true
+//        }else{
+//             itemarray[indexPath.row].done = false
+//        }
+         tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        }else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+      
     }
     // add new item
     
@@ -42,7 +71,9 @@ class planelistviewcontroller: UITableViewController {
         var textfield = UITextField()
         let alert = UIAlertController(title: "add new plane", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "add item", style: .default) { (action) in
-            self.itemarray.append(textfield.text!)
+            let newitem = Item()
+            newitem.title = textfield.text!
+            self.itemarray.append(newitem)
             self.defaults.set(self.itemarray, forKey: "plannerlistarray")
             self.tableView.reloadData()
         }
