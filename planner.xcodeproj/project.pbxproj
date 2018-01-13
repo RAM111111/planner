@@ -41,6 +41,7 @@
 			isa = PBXGroup;
 			children = (
 				218AB8D0200264C100DDB5B4 /* planner */,
+				218AB8DD200264C100DDB5B4 /* Info.plist */,
 				218AB8CF200264C100DDB5B4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -93,7 +94,6 @@
 			isa = PBXGroup;
 			children = (
 				218AB8DA200264C100DDB5B4 /* LaunchScreen.storyboard */,
-				218AB8DD200264C100DDB5B4 /* Info.plist */,
 				218AB8D8200264C100DDB5B4 /* Assets.xcassets */,
 			);
 			path = acss;
@@ -311,7 +311,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = planner/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "-.planner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -325,7 +325,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = planner/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "-.planner";
 				PRODUCT_NAME = "$(TARGET_NAME)";

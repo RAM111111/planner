@@ -10,9 +10,15 @@ import UIKit
 
 class planelistviewcontroller: UITableViewController {
     var itemarray = [Item]()
-    let defaults = UserDefaults.standard
+ let datafilepath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
+
+//    let defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
+       print(datafilepath)
+        
+        
+        
         let newitem = Item()
         newitem.title = "making cake"
         itemarray.append(newitem)
@@ -23,7 +29,7 @@ class planelistviewcontroller: UITableViewController {
         
         let newitem3 = Item()
         newitem3.title = "tryphoto"
-      
+      loaddata()
         // tableview data sourse method
         
 //        if let  items = defaults.array(forKey: "plannerlistarray") as? [String]{
@@ -38,14 +44,15 @@ class planelistviewcontroller: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "planneritemlist", for: indexPath)
         let item = itemarray[indexPath.row]
         cell.textLabel?.text = item.title
+        
         cell.accessoryType =  item.done ? .checkmark : .none
         
         
-        if  item.done == true {
-            cell.accessoryType = .checkmark
-        }else{
-            cell.accessoryType = .none
-        }
+//        if  item.done == true {
+//            cell.accessoryType = .checkmark
+//        }else{
+//            cell.accessoryType = .none
+//        }
        return cell
 
         
@@ -61,7 +68,8 @@ class planelistviewcontroller: UITableViewController {
 //        }else{
 //             itemarray[indexPath.row].done = false
 //        }
-         tableView.reloadData()
+        saveitem()
+        // tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
       
     }
@@ -74,8 +82,9 @@ class planelistviewcontroller: UITableViewController {
             let newitem = Item()
             newitem.title = textfield.text!
             self.itemarray.append(newitem)
-            self.defaults.set(self.itemarray, forKey: "plannerlistarray")
-            self.tableView.reloadData()
+           self.saveitem()
+//            self.defaults.set(self.itemarray, forKey: "plannerlistarray")
+            
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "create new item"
@@ -85,6 +94,29 @@ class planelistviewcontroller: UITableViewController {
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
-    
+    func saveitem (){
+        let encoder = PropertyListEncoder ()
+        do {
+            let data = try encoder.encode(itemarray)
+            try data.write(to: datafilepath!)
+        }
+        catch{print("error\(error)")}
+        self.tableView.reloadData()
+        
+    }
+    func loaddata(){
+        if let data = try? Data(contentsOf: datafilepath!){
+            let decoder = PropertyListDecoder()
+            do{
+                itemarray = try decoder.decode([Item].self, from: data)
+            }catch{
+                print("decoder error\(error)")
+            }
+            
+            
+        }
+        
+        
+    }
     
 }
