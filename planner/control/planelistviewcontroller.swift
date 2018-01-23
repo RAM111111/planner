@@ -7,29 +7,35 @@
 //
 
 import UIKit
+import CoreData
 
-class planelistviewcontroller: UITableViewController {
+class planelistviewcontroller: UITableViewController  {
     var itemarray = [Item]()
- let datafilepath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
-
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var selectedcategory : Category?{
+        didSet{
+             loaddata()
+        }
+    }
 //    let defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
-       print(datafilepath)
+       print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         
+//
+//        let newitem = Item()
+//        newitem.title = "making cake"
+//        itemarray.append(newitem)
+//
+//        let newitem2 = Item()
+//        newitem2.title = "tryprog"
+//        itemarray.append(newitem2)
+//
+//        let newitem3 = Item()
+//        newitem3.title = "tryphoto"
         
-        let newitem = Item()
-        newitem.title = "making cake"
-        itemarray.append(newitem)
-        
-        let newitem2 = Item()
-        newitem2.title = "tryprog"
-        itemarray.append(newitem2)
-        
-        let newitem3 = Item()
-        newitem3.title = "tryphoto"
-      loaddata()
+      //  loaddata()
         // tableview data sourse method
         
 //        if let  items = defaults.array(forKey: "plannerlistarray") as? [String]{
@@ -60,6 +66,9 @@ class planelistviewcontroller: UITableViewController {
      // tableview delegate method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     //    print(itemarray[indexPath.row])
+//        context.delet(itemarray[indexPath.row])
+//        itemarray.remove(at: indexPath.row)
+        
         
         itemarray[indexPath.row].done = !itemarray[indexPath.row].done
         //the single lin short the down code
@@ -73,14 +82,17 @@ class planelistviewcontroller: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
       
     }
-    // add new item
+   // add new item
     
     @IBAction func addbuttonpressed(_ sender: UIBarButtonItem) {
         var textfield = UITextField()
         let alert = UIAlertController(title: "add new plane", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "add item", style: .default) { (action) in
-            let newitem = Item()
+          
+            let newitem = Item(context:self.context)
             newitem.title = textfield.text!
+            newitem.done = false
+            newitem.parentcategory = self.selectedcategory
             self.itemarray.append(newitem)
            self.saveitem()
 //            self.defaults.set(self.itemarray, forKey: "plannerlistarray")
@@ -95,28 +107,70 @@ class planelistviewcontroller: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     func saveitem (){
-        let encoder = PropertyListEncoder ()
         do {
-            let data = try encoder.encode(itemarray)
-            try data.write(to: datafilepath!)
+            try context.save()
+            
         }
-        catch{print("error\(error)")}
+        catch{
+            print("error saving context \(error)")
+        }
         self.tableView.reloadData()
         
     }
-    func loaddata(){
-        if let data = try? Data(contentsOf: datafilepath!){
-            let decoder = PropertyListDecoder()
-            do{
-                itemarray = try decoder.decode([Item].self, from: data)
-            }catch{
-                print("decoder error\(error)")
-            }
-            
-            
+    func loaddata(whith request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
+        let categorypredicate = NSPredicate(format: "parentcategory.name MATCHES %@", selectedcategory!.name!)
+        if let additionalpredicate = predicate {
+           request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categorypredicate,additionalpredicate])
+        }else{
+            request.predicate = categorypredicate
         }
-        
-        
+        do{
+        itemarray = try context.fetch(request)
+        }catch{
+            print("catching error \(error)")
+        }
+
+
     }
     
 }
+
+extension planelistviewcontroller : UISearchBarDelegate{
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+       let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        loaddata(whith: request, predicate: predicate)
+    
+    
+    }
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0{
+            loaddata()
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
+    
+    
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
